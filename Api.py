@@ -35,7 +35,7 @@ def findword():
             if not (array[i].find('.')>-1):
                 return root()
             if not (array[i].find('http')>-1):
-                array[i] = 'http://'+array[i]
+                array[i] = 'http://'+(array[i].strip())
 
     #Atribui o termo
         word = request.args.get('termo', default = "", type = str)

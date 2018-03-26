@@ -10,7 +10,7 @@ class LinkParser(HTMLParser):
     # retorna o html das páginas
     def getLinks(self, url):
         #Caso o arquivo de cache não exista
-        localurl = url.replace('/', '\\')
+        localurl = url.replace('/', '-')
         pathcachefolder = os.getcwd()+"/cache"
         if not os.path.isfile(pathcachefolder+'/'+localurl+'.html'):
             response = urlopen(url)
@@ -23,7 +23,7 @@ class LinkParser(HTMLParser):
         
 
 def storeCache(data, url):
-    localurl = url.replace('/', '\\')
+    localurl = url.replace('/', '-')
     pathcachefolder = os.getcwd()+"/cache"
     if not os.path.exists(pathcachefolder):
         os.makedirs(pathcachefolder)       
@@ -36,7 +36,7 @@ def storeCache(data, url):
 def removeCache(url):
 #Caminho da pasta de cache e alteração da url
     pathcachefolder = os.getcwd()+"/cache"
-    localurl = url.replace('/', '\\')
+    localurl = url.replace('/', '-')
 #Se o arquivo de cache não existir
     if not os.path.exists(pathcachefolder+"/"+localurl+'.html'):
         return
