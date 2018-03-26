@@ -33,7 +33,7 @@ Basta usar a url passando os parâmetros
 * ignorecache: Define se o cache em disco será utilizado (False) ou ignorado e os dados baixados novamente (True)
 
 ### Exemplo com todos os parâmetros
-`http://127.0.0.1:5000/findword?urls=['https://www.jovemnerd.com.br', 'canaltech.com.br']&termo=nerd<b>&ignorecache=True`
+`http://127.0.0.1:5000/findword?urls=['https://www.jovemnerd.com.br', 'canaltech.com.br']&termo=nerd&ignorecache=True`
 
 ## Testes
 Instalação Pytest
