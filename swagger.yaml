@@ -32,11 +32,18 @@ paths:
           description: Termo que vai ser buscado nas urls
           required: true
           type: string
-          format: string          
+          format: string  
+        - name: ignorecache
+          in: query
+          description: Permite ignorar o cache em disco
+          default: false
+          required: false
+          type: string
+          format: string           
       responses:
         '200':
           description: Crawler executado com sucesso
         default:
           description: '{}'
           schema:
-            $ref: '#/'
+            $ref: '#'
