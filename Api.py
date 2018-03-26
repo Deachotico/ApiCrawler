@@ -11,7 +11,10 @@ app = Flask(__name__)
 @app.route('/')
 def root():
     return '''
-    O formato correto de chamada eh: http://127.0.0.1:5000/findword?urls=[url1,url2]&termo=termo_a_pesquisar"
+    <b>O formato correto de chamada é:</b> </br> http://127.0.0.1:5000/findword?urls=[url1,url2]&termo=termo_a_pesquisar</br>
+    <b>Parâmetro opcional: </b>
+    A Api armazena um cache em disco para uso posterior, caso queira ignorar esse cache envie o parâmetro <b>ingorecache</b></br>
+    http://127.0.0.1:5000/findword?urls=[url1,url2]&termo=termo_a_pesquisar<b>&ignorecache=True</b>
     '''
 
 #Recebe os orgumentos e 
@@ -21,13 +24,26 @@ def findword():
     if (request.args.get('urls', default = [], type = str) and request.args.get('termo', default = "error", type = str) ):
     #Pega a string com as urls e trata para se tornar uma lista de urls
         array = request.args.get('urls', default = [], type = str)
+    #Tratamento contra erros básicos de digitação
         array = array.replace("[", "")
         array = array.replace("]", "")
+        array = array.replace("'", "")
+        array = array.replace('"', "")
         array = array.split(",")
+        #verifica se contém . na url e se contem o protocolo http ou https
+        for i in range(len(array)):
+            if not (array[i].find('.')>-1):
+                return root()
+            if not (array[i].find('http')>-1):
+                array[i] = 'http://'+array[i]
+
     #Atribui o termo
-        word = request.args.get('termo', default = "error", type = str)
-    #Converte a resposta para json e entrega
-        return jsonify(Crawler.spider(array, word , len(array)))
+        word = request.args.get('termo', default = "", type = str)
+    #verifica e atribui o parâmetro opcional ignorecache
+        ignorecache = request.args.get('ignorecache', default = 'False', type = str)
+        if (ignorecache == 'False' or ignorecache == 'false' or ignorecache == '0' or ignorecache == ''):
+            return jsonify(Crawler.spider(array, word , len(array) , False))
+        #Qualquer caso que não seja parametro inexistente ou igual a false passa True
+        return jsonify(Crawler.spider(array, word , len(array) , True))
     #Caso os parametros não sejam passados retorna a página com referencia de parametros
     return root()
-    
