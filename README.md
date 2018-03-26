@@ -7,17 +7,24 @@ Api que recebe uma lista de URLS e um termo a ser pesquisado seguindo o formato:
 Api utiliza Flask como base, e Pytest para os testes.
 
 ## Deploy
-Instalação do Pip para python 3
+Instalação do Pip para python 3 no linux
 
 `sudo apt-get install python3-pip`
+
+A instalação do Python 3 no Windows já vem com o pip3.
 
 Instalação do flask para python 3
 
 `pip3 install flask`
 
 Exportar e rodar a aplicação
-
+### Linux
 `export FLASK_APP=Api.py`
+
+`flask run`
+
+### Windows
+`set FLASK_APP=Api.py`
 
 `flask run`
 
