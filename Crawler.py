@@ -121,5 +121,3 @@ def spider(url, word, maxPages, ignorecache):
     else:
         #retorna um objeto vazio se o termo não for encontrado
         return  ({})
-
-#spider(['https://jovemnerd.com.br' ,'https://techcrunch.com/', 'https://canaltech.com.br/ultimas/p2/', 'http://globoesporte.globo.com/', 'https://www.youtube.com/'], 'video', 4, True)
