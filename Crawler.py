@@ -9,9 +9,10 @@ import os
 class LinkParser(HTMLParser):
     # retorna o html das páginas
     def getLinks(self, url):
-        #Caso o arquivo de cache não exista
-        localurl = url.replace('/', '-')
+        #Formata a url pra poder ser usada como nome do arquivo de cache
+        localurl = formatanomearquivowindows(url)
         pathcachefolder = os.getcwd()+"/cache"
+        #Caso o arquivo de cache não exista, busca o html na url
         if not os.path.isfile(pathcachefolder+'/'+localurl+'.html'):
             response = urlopen(url)
             htmlBytes = response.read()
@@ -23,27 +24,49 @@ class LinkParser(HTMLParser):
         
 
 def storeCache(data, url):
-    localurl = url.replace('/', '-')
+    #Formata a url pra poder ser usada como nome do arquivo de cache
+    localurl = formatanomearquivowindows(url)
     pathcachefolder = os.getcwd()+"/cache"
+    #Cria a pasta de cache se não existir
     if not os.path.exists(pathcachefolder):
-        os.makedirs(pathcachefolder)       
+        os.makedirs(pathcachefolder)      
+    # Verifica se o cache existe
     if not os.path.isfile(pathcachefolder+'/'+localurl+'.html'):
-        cachepath = pathcachefolder+"/"+localurl+'.html'
-        cachefile = open(cachepath,'w')
-        cachefile.write(data)
-        cachefile.close()
+        #Tenta criar e escrevcer o arquivo de cache
+        try:
+            cachepath = pathcachefolder+"/"+localurl+'.html'
+            cachefile = open(cachepath,"w")
+            cachefile.write(data)
+            cachefile.close()
+        #Em caso de erro deleta o arquivo criado
+        except:
+            cachefile.close()
+            removeCache(url)
+            print("Não foi possível armazenar o cache")
+            
 
 def removeCache(url):
 #Caminho da pasta de cache e alteração da url
     pathcachefolder = os.getcwd()+"/cache"
-    localurl = url.replace('/', '-')
+#Formata a url pra poder ser usada como nome do arquivo de cache
+    localurl = formatanomearquivowindows(url)
 #Se o arquivo de cache não existir
     if not os.path.exists(pathcachefolder+"/"+localurl+'.html'):
         return
     os.remove(pathcachefolder+"/"+localurl+'.html')
     return
 
-
+def formatanomearquivowindows(url):
+    #Formatação da url pelas limitações de nome de arquivo do windows
+    localurl = url.replace('/', '-')
+    localurl = localurl.replace('?', '')
+    localurl = localurl.replace('"', '')
+    localurl = localurl.replace('*', '')
+    localurl = localurl.replace(':', '')
+    localurl = localurl.replace('<', '')
+    localurl = localurl.replace('>', '')
+    localurl = localurl.replace('|', '')
+    return localurl
 
 # Crawler que recebe as urls a pesquisar, o termo a ser pesquisado e a quantidade de urls enviadas pela api.
 def spider(url, word, maxPages, ignorecache):  
@@ -68,7 +91,7 @@ def spider(url, word, maxPages, ignorecache):
         if ignorecache:
             removeCache(url)
         try:
-            print("Procurando em:", url, "Restam: ", len(pagesToVisit)+1," páginas.")
+            print("Procurando em:", url, "Restam ", len(pagesToVisit)+1," páginas.")
             parser = LinkParser()
         # getLinks retorna o html da página
             data = parser.getLinks(url)
@@ -88,8 +111,7 @@ def spider(url, word, maxPages, ignorecache):
                 print("Termo não encontrado")
         except:
             print(" ERRO: verifique a url: ", url, " Deve estar no formato http://site.com")
-            raise AttributeError
-
+            pass
     #monta o objeto retornado a api
     for i in range(len(urlscalled)):
         JsonReturn[urlscalled[i]] = timesfound[i]
@@ -100,4 +122,4 @@ def spider(url, word, maxPages, ignorecache):
         #retorna um objeto vazio se o termo não for encontrado
         return  ({})
 
-#spider(['https://www.jovemnerd.com.br', 'https://canaltech.com.br/ultimas/p2/'], 'nerd', 2, False)
+#spider(['https://jovemnerd.com.br' ,'https://techcrunch.com/', 'https://canaltech.com.br/ultimas/p2/', 'http://globoesporte.globo.com/', 'https://www.youtube.com/'], 'video', 4, True)

@@ -10,7 +10,6 @@ def teste_input_errors():
     with pytest.raises(IndexError):
         #parametros digitados sem forma de array
         Crawler.spider(('https://canaltech.com.br/', 'https://jovemnerd.com.br/'), 'google', 2, False)
-    with pytest.raises(AttributeError):
         #Urls incompletas
         Crawler.spider(['https://canaltech.com.br/', 'jovemnerd.com.br/'], 'google', 2, False)
         #Parametros que não representam urls
