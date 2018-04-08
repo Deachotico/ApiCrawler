@@ -99,3 +99,12 @@ ENV/
 
 # mypy
 .mypy_cache/
+*.html
+*.cfg
+Scripts/activate
+*.bat
+*.ps1
+*.exe
+*.dll
+tutorial-env/Scripts/activate
+tutorial-env/pip-selfcheck.json
