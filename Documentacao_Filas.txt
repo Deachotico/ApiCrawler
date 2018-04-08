@@ -1,0 +1,36 @@
+Todos tem que receber as filas que consomem e que inserem
+Todos precisam de um break quando a fila = none e os que inserem inserir none no final da fila
+
+def spider(url, ignorecache): #Producer  
+if ignorecache - put ToRemoveCacheUrl
+data = parser.getLinks(url) - put ToProcessUrlQueue
+
+def getLinks(self, url): #producer 
+ToProcessUrlQueue
+put in 
+ToConsumeDataQueue
+ToConsumeUrl
+
+ToStoreDataQueue
+ToStoreUrlQueue
+
+
+def storeCache(data, url): #producer sem retorno 
+ToStoreDataQueue, ToStoreUrlQueue
+except:
+            cachefile.close()
+            removeCache(url) - em caso de erro no armazenamento put ToRemoveCacheUrl
+
+
+def removeCache(url): #Síncrona UrlQueue
+#não precisa de queue pq é síncrona, caso precise
+ToRemoveCacheUrl
+
+
+def ConsumeHtml (word, data, url):
+recebe ToConsumeDataQueue, ToConsumeUrl
+
+
+
+def formatanomearquivowindows(url): #Síncrona 
+#Removida pra facilitar o gerenciamento de filas
