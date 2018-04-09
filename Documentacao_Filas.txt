@@ -1,36 +1,30 @@
 Todos tem que receber as filas que consomem e que inserem
-Todos precisam de um break quando a fila = none e os que inserem inserir none no final da fila
+Todos precisam de adicionar um None ao final da fila
 
-def spider(url, ignorecache): #Producer  
-if ignorecache - put ToRemoveCacheUrl
-data = parser.getLinks(url) - put ToProcessUrlQueue
+def spider(url, ignorecache, ToProcessUrlQueue):   
+recebe uma lista de urls, boolean ignorecache e a fila de urls a serem processadas, onde ele insere as urls
 
 def getLinks(self, url): #producer 
-ToProcessUrlQueue
-put in 
-ToConsumeDataQueue
-ToConsumeUrl
-
-ToStoreDataQueue
-ToStoreUrlQueue
+async def getLinks(self, ToProcessUrlQueue, ToConsumeDataQueue, ToConsumeUrlQueue, ToStoreDataQueue, ToStoreUrlQueue): #producer 
+recebe a lista de urls a serem processadas (ToProcessUrlQueue)
+insere os dados a serem consumidos nas filas ToConsumeDataQueue, que vai pra função ConsumeHtml e ToStoreDataQueue que vai pra função storeCache.
+Insere também as urls correspondentes aos dados nas filas ToConsumeUrlQueue (consumida na ConsumeHtml) e ToStoreUrlQueue (consumida na storeCache)
 
 
-def storeCache(data, url): #producer sem retorno 
-ToStoreDataQueue, ToStoreUrlQueue
-except:
-            cachefile.close()
-            removeCache(url) - em caso de erro no armazenamento put ToRemoveCacheUrl
+async def storeCache(ToStoreDataQueue, ToStoreUrlQueue):
+recebe a fila com os conteúdos html onde serão guardados em cache (ToStoreDataQueue) e a lista com as respectivas urls (ToStoreUrlQueue).
 
+async def ConsumeHtml (word, ToConsumeDataQueue, ToConsumeUrlQueue, FinalQueue):
+recebe o termo que vai ser buscado, a fila com os conteúdos html onde serão buscados os termos (ToConsumeDataQueue) e a lista com as respectivas urls (ToConsumeUrlQueue).
+insere a quantidade de ocorrências e as urls em que foram encontrados os termos na FinalQueue
 
-def removeCache(url): #Síncrona UrlQueue
-#não precisa de queue pq é síncrona, caso precise
-ToRemoveCacheUrl
+async def createreturn(FinalQueue):
+recebe a fila com a quantidade de ocorrências e as urls em que foram encontrados os termos, monta o objeto e retorna para ser apresentado como Json.
 
+def removeCache(url):
+removida pra facilitar o gerenciamento de filas
 
-def ConsumeHtml (word, data, url):
-recebe ToConsumeDataQueue, ToConsumeUrl
-
-
-
-def formatanomearquivowindows(url): #Síncrona 
+def formatanomearquivowindows(url): 
 #Removida pra facilitar o gerenciamento de filas
+
+

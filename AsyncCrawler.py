@@ -6,8 +6,6 @@ from re import sub
 import os
 import asyncio
 import aiohttp
-import random
-
 
 async def controlespider(url, word, ignorecache): #Consumer + Producer  
     #Testa se o termo de pesquisa não é vazio
@@ -18,6 +16,7 @@ async def controlespider(url, word, ignorecache): #Consumer + Producer
     #inicia e controla o loop
     parser = LinkParser()
     
+    #Filas utilizadas pra transitar os dados
     loop = asyncio._get_running_loop()
     ToProcessUrlQueue = asyncio.Queue(loop=loop) #Fila de urls a serem baixadas pela getlinks
     ToConsumeDataQueue =  asyncio.Queue(loop=loop) #HTML em string baixado pela getlinks PARA PROCESSAMENTO DA ConsumeHtml
@@ -26,32 +25,35 @@ async def controlespider(url, word, ignorecache): #Consumer + Producer
     ToStoreUrlQueue =  asyncio.Queue(loop=loop) #URL do html baixado pela getlinks PARA PROCESSAMENTO DA storecache
     FinalQueue = asyncio.Queue(loop=loop)
     
+    #inicia e aguarda os processos necessários
     await spider(url, ignorecache, ToProcessUrlQueue)
     await parser.getLinks(ToProcessUrlQueue, ToConsumeDataQueue, ToConsumeUrlQueue, ToStoreDataQueue, ToStoreUrlQueue)
     await ConsumeHtml (word, ToConsumeDataQueue, ToConsumeUrlQueue, FinalQueue)
     await storeCache(ToStoreDataQueue, ToStoreUrlQueue)
-    
     var = await createreturn(FinalQueue)
     return var
 
+#Cria o objeto final a ser retornado
 async def createreturn(FinalQueue):
-    #global Jsonreturn
     Jsonreturn = {}
     while True:
         item = await FinalQueue.get()
+        #se encontrar o fim da fila retorna o objeto
         if item is None:
             return Jsonreturn
         times = await FinalQueue.get()
         Jsonreturn[item] = times
 
 
-# Crawler que recebe as urls a pesquisar, o termo a ser pesquisado e a quantidade de urls enviadas pela api.
-async def spider(url, ignorecache, ToProcessUrlQueue): #Insere none ao final de todas as filas
+# Crawler que recebe as urls a pesquisar, deleta o cache se necessário e insere as urls para processamento
+async def spider(url, ignorecache, ToProcessUrlQueue):
     pagesToVisit = url  #Lista de urls
-    # Laço principal.
-    # Valida se ainda restam urls a visitar
+    
+    #Indica a quantidade inicial de urls para o controle do fim das filas
     global lengthpagesToVisit
     lengthpagesToVisit = len(pagesToVisit)
+    # Laço principal.
+    
     for url in pagesToVisit:
         #apaga o cache se solicitado
         if ignorecache:
@@ -66,20 +68,21 @@ async def spider(url, ignorecache, ToProcessUrlQueue): #Insere none ao final de 
             localurl = localurl.replace('<', '')
             localurl = localurl.replace('>', '')
             localurl = localurl.replace('|', '')
-        #Se o arquivo de cache não existir
+        #Deleta o arquivo de cache
             if os.path.exists(pathcachefolder+"/"+localurl+'.html'):
                 os.remove(pathcachefolder+"/"+localurl+'.html')
         try:
-            print("Procurando em:", url, "Restam ", len(pagesToVisit)+1," páginas.")
-        # getLinks retorna o html da página
+            # Insere as urls na fila de processamento
             await ToProcessUrlQueue.put(url)
         except:
             print(" ERRO: verifique a url: ", url, " Deve estar no formato http://site.com")
+    #Insere None ao final da fila
     await ToProcessUrlQueue.put(None)
 
 class LinkParser(HTMLParser): #Producer
-    # retorna o html das páginas
+    # retorna o html das páginas e indica o fim das filas
     async def getLinks(self, ToProcessUrlQueue, ToConsumeDataQueue, ToConsumeUrlQueue, ToStoreDataQueue, ToStoreUrlQueue): #producer 
+        #Contador de controle para inserir None ao fim das filas
         endflag = 0
         while True:
             url = await ToProcessUrlQueue.get()
@@ -99,26 +102,28 @@ class LinkParser(HTMLParser): #Producer
             
             #Caso o arquivo de cache não exista, busca o html na url
             if not os.path.isfile(pathcachefolder+'/'+localurl+'.html'):
+                #Busca o HTML do site usando aiohttp
                 async with aiohttp.ClientSession() as session:
                     async with session.get(url) as response:
                         htmlString = await response.text()
-                #Queues do consumehtml
+                #insere nas filas da consumehtml
                 await ToConsumeDataQueue.put(htmlString)
                 await ToConsumeUrlQueue.put(url)
-                #queues do storecache
+                #insere nas filas da storecache
                 await ToStoreDataQueue.put(htmlString)
                 await ToStoreUrlQueue.put(url)
             else:
+                #Se existir o cache local busca no disco
                 cachelocal = open(pathcachefolder+'/'+localurl+'.html', 'r', encoding="utf-8")
+                #insere nas filas da consumehtml
                 await ToConsumeDataQueue.put(cachelocal.read())
                 await ToConsumeUrlQueue.put(url)
-                #queues do storecache
+                #insere nas filas da storecache
                 await ToStoreDataQueue.put(cachelocal.read())
                 await ToStoreUrlQueue.put(url)
             endflag += 1
             if lengthpagesToVisit == endflag:
-                print ("HUe")
-            #Última operação sinaliza o fim de todas as filas
+            #Quando o contador indica que não há mais urls a serem processadas, sinaliza o fim de todas as filas
                 await ToConsumeDataQueue.put(None)
                 await ToConsumeUrlQueue.put(None)
                 await ToStoreDataQueue.put(None)
@@ -126,11 +131,7 @@ class LinkParser(HTMLParser): #Producer
                 break
 
 
-async def fetch(session, url):
-    async with session.get(url) as response:
-         await response.text()
-
-async def storeCache(ToStoreDataQueue, ToStoreUrlQueue): #producer sem retorno #DataQueue e UrlQueue
+async def storeCache(ToStoreDataQueue, ToStoreUrlQueue): #Guarda o cache em disco
     while True:
         data = await ToStoreDataQueue.get()
         data = str(data) #Caso erro de tipo   
@@ -167,6 +168,7 @@ async def storeCache(ToStoreDataQueue, ToStoreUrlQueue): #producer sem retorno #
                 if os.path.exists(pathcachefolder+"/"+localurl+'.html'):
                     os.remove(pathcachefolder+"/"+localurl+'.html')
 
+#Busca o termo no html e se for encontrado insere na fila final
 async def ConsumeHtml (word, ToConsumeDataQueue, ToConsumeUrlQueue, FinalQueue):
     while True:
         data = await ToConsumeDataQueue.get()
@@ -176,20 +178,20 @@ async def ConsumeHtml (word, ToConsumeDataQueue, ToConsumeUrlQueue, FinalQueue):
         if url is None or url == "None":
             break
         foundWord = False   #Boolean para teste de o termo existe na página
-    # cria o arquivo de cache
         try:
-            #Remove as tags do html e deixa só o conteúdo em texto
+            #Regex que Remove as tags do html e deixa só o conteúdo em texto
             data = sub('<.*?>', ' ', data)
             #Confirma se o termo está na página
             if data.find(word)>-1:
                 foundWord = True
-                #Conta as ocorrências e adiciona na lista de ocorrências
+                #Conta as ocorrências e adiciona na fila de ocorrências
                 print ("página: " + url)
                 print("Termo encontrado: ",data.count(word) , " vezes")
                 await FinalQueue.put(url)
                 await FinalQueue.put(data.count(word))
             else:
-                print("Termo não encontrado")
+                print("Termo não encontrado em: "+url)
         except:
             print(" ERRO: verifique a url: ", url, " Deve estar no formato http://site.com")
+    #Indica o fim da fila com as ocorrências do termo
     await FinalQueue.put(None)

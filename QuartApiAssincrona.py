@@ -20,7 +20,7 @@ def root():
     </br><b>A lista precisa conter urls válidas<b></br>
     '''
 
-#Recebe os orgumentos e 
+#Recebe os orgumentos
 @app.route('/findword')
 async def findword():
     #Verifica se os perâmetros foram enviados
@@ -52,7 +52,6 @@ async def findword():
         ignorecache = request.args.get('ignorecache', default = 'False')
         if (ignorecache == 'False' or ignorecache == 'false' or ignorecache == '0' or ignorecache == ''):
             return jsonify (await AsyncCrawler.controlespider(array, word , False))
-        #Qualquer caso que não seja parametro inexistente ou igual a false passa True
+        #Qualquer caso que não seja parametro inexistente ou igual a false envia True
         return jsonify (await AsyncCrawler.controlespider(array, word , True))
-    #Caso os parametros não sejam passados retorna a página com referencia de parametros
 app.run()    
