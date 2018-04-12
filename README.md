@@ -4,7 +4,7 @@ Api que recebe uma lista de URLS e um termo a ser pesquisado seguindo o formato:
 
 `http://127.0.0.1:5000/findword?array=[url1,url2]&word=termo_a_pesquisar`
 
-Api utiliza Flask como base, e Pytest para os testes.
+Api utiliza Quart como base, uma versão assíncrona do Flask, e Pytest para os testes.
 
 ## Deploy
 Instalação do Pip para python 3 no linux
@@ -13,20 +13,21 @@ Instalação do Pip para python 3 no linux
 
 A instalação do Python 3 no Windows já vem com o pip3.
 
-Instalação do flask para python 3
+Instalação do quart para python 3
 
-`pip3 install flask`
+`pip install quart`
+
+Instalação do aiohttp para python 3
+`pip install aiohttp`
 
 Exportar e rodar a aplicação
 ### Linux
-`export FLASK_APP=Api.py`
-
-`flask run`
+`export QUART_APP=Quart.py`
+`quart run`
 
 ### Windows
-`set FLASK_APP=Api.py`
-
-`flask run`
+`set QUART_APP=Quart.py`
+`quart run`
 
 Basta usar a url passando os parâmetros
 
@@ -51,4 +52,5 @@ Rodar o comando pytest na pasta
 
 `pytest`
 
-
+## Medição de tempo de execução
+Basta rodar os dois arquivos que medem o tempo de execução `AfeTempoAsync.py` mede o tempo do assíncrono e `AfeTempoNormal.py` mede o tempo do processo síncrono.
