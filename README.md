@@ -23,10 +23,12 @@ Instalação do aiohttp para python 3
 Exportar e rodar a aplicação
 ### Linux
 `export QUART_APP=Quart.py`
+
 `quart run`
 
 ### Windows
 `set QUART_APP=Quart.py`
+
 `quart run`
 
 Basta usar a url passando os parâmetros
