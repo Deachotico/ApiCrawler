@@ -108,3 +108,6 @@ Scripts/activate
 *.dll
 tutorial-env/Scripts/activate
 tutorial-env/pip-selfcheck.json
+.idea/
+venvrefactoring/
+

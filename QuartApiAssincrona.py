@@ -5,7 +5,10 @@ from quart import jsonify
 from quart import request
 import AsyncCrawler
 import asyncio
+import time
+
 app = Quart(__name__)
+start_time = time.time()
 
 #Referencia de url para ser utilizada
 @app.route('/')
@@ -54,4 +57,9 @@ async def findword():
             return jsonify (await AsyncCrawler.controlespider(array, word , False))
         #Qualquer caso que não seja parametro inexistente ou igual a false envia True
         return jsonify (await AsyncCrawler.controlespider(array, word , True))
-app.run()    
+
+    print("\n"*5)
+    print("TEMPO API ASYNC")
+    print("--- %s seconds ---" % (time.time() - start_time))
+
+app.run()

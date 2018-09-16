@@ -15,19 +15,19 @@ A instalação do Python 3 no Windows já vem com o pip3.
 
 Instalação do quart para python 3
 
-`pip install quart`
+`pip3 install quart`
 
 Instalação do aiohttp para python 3
-`pip install aiohttp`
+`pip3 install aiohttp`
 
 Exportar e rodar a aplicação
 ### Linux
-`export QUART_APP=Quart.py`
+`export QUART_APP=QuartApiAssincrona.py`
 
 `quart run`
 
 ### Windows
-`set QUART_APP=Quart.py`
+`set QUART_APP=QuartApiAssincrona.py`
 
 `quart run`
 
@@ -53,6 +53,3 @@ Instalação Pytest
 Rodar o comando pytest na pasta
 
 `pytest`
-
-## Medição de tempo de execução
-Basta rodar os dois arquivos que medem o tempo de execução `AfeTempoAsync.py` mede o tempo do assíncrono e `AfeTempoNormal.py` mede o tempo do processo síncrono.

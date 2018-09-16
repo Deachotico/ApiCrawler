@@ -5,7 +5,10 @@ from flask import request
 from flask import jsonify
 import subprocess
 import Crawler
+import time
+
 app = Flask(__name__)
+start_time = time.time()
 
 #Referencia de url para ser utilizada
 @app.route('/')
@@ -55,3 +58,6 @@ def findword():
         return jsonify(Crawler.spider(array, word , len(array) , True))
     #Caso os parametros não sejam passados retorna a página com referencia de parametros
     return root()
+    print("\n" * 5)
+    print("TEMPO API ASYNC")
+    print("--- %s seconds ---" % (time.time() - start_time))
